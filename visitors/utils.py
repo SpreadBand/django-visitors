@@ -1,5 +1,7 @@
 from datetime import datetime, timedelta
 
+from django.contrib.contenttypes.models import ContentType
+
 from .models import Visit
 
 def record_visit(visitor, visited, timeout=3600):
@@ -13,21 +15,22 @@ def record_visit(visitor, visited, timeout=3600):
     time_limit = datetime.now() - timedelta(seconds=timeout)
 
     try:
-        visit = Visit.objects.get(visitor_content_type__pk=visitor_ctype.pk,
+        visit = Visit.objects.get(visitor_content_type=visitor_ctype,
                                   visitor_object_id=visitor.pk,
-                                  visited_content_type__pk=visited_ctype.pk,
+                                  visited_content_type=visited_ctype,
                                   visited_object_id=visited.pk,
                                   when__gt=time_limit)
         
         # If we have a record, then update its time
-        visit.update(when=datetime.now())
+        visit.when = datetime.now()
+        visit.save()
 
         return visit
 
     except Visit.DoesNotExist, e:
-        return Visit.objects.create(visitor_content_type__pk=visitor_ctype.pk,
+        return Visit.objects.create(visitor_content_type=visitor_ctype,
                                     visitor_object_id=visitor.pk,
-                                    visited_content_type__pk=visited_ctype.pk,
+                                    visited_content_type=visited_ctype,
                                     visited_object_id=visited.pk)
     
 
