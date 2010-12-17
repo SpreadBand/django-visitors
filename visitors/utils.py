@@ -35,7 +35,19 @@ def record_visit(visitor, visited, timeout=3600):
     
 
         
+def get_latest_visits_for(anObject, limit=10):
+    """
+    Get the latest visits for a given object and a given limit
+    """
+    object_ctype = ContentType.objects.get_for_model(anObject)
 
+    try:
+        visits = Visit.objects.filter(visited_content_type=object_ctype,
+                                      visited_object_id=anObject.pk)[:limit]
+    except Visit.DoesNotExist:
+        visits = []
+    
+    return visits
 
 
 

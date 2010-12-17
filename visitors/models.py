@@ -18,9 +18,8 @@ class Visit(models.Model):
     visited_object_id = models.PositiveIntegerField(db_index=True)
     visited = generic.GenericForeignKey('visited_content_type', 'visited_object_id')
 
-
-
-
+    def __unicode__(self):
+        return u"%s watched %s" % (self.visitor, self.visited)
 
 
 
